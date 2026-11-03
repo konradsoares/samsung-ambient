@@ -1,0 +1,46 @@
+name: Publish Samsung Ambient Gallery (200 licensed photos)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Download, crop and credit 200 Wikimedia Commons photos
+        run: python scripts/import_stock_photos.py --per-group 25 --width 1920 --height 1080
+      - name: Generate groups catalog
+        run: python scripts/generate_catalog.py
+      - name: Verify gallery photo count
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('docs/catalog.json').read_text())
+          n=sum(len(g['images']) for g in d['groups'])
+          assert len(d['groups']) == 8 and n == 200, (len(d['groups']), n)
+          print(f'Validated: {len(d["groups"])} groups, {n} photos')
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deployment
+        uses: actions/deploy-pages@v4

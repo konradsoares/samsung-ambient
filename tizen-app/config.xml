@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="http://example.org/samsungambientintegrated" version="2.0.0" viewmodes="fullscreen">
+  <name>Samsung Ambient Gallery</name>
+  <description>Tizen image group slideshow using a GitHub Pages catalog</description>
+  <content src="index.html"/>
+  <icon src="icon.png"/>
+  <tizen:application id="AmbntTV001.AmbientScreen" package="AmbntTV001" required_version="2.3"/>
+  <tizen:profile name="tv-samsung"/>
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <access origin="*" subdomains="true"/>
+  <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>
