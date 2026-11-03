@@ -13,6 +13,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 330
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -21,11 +22,139 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: requirements.txt
       - run: pip install -r requirements.txt
-      - name: Download, crop and credit 200 Wikimedia Commons photos
-        run: python scripts/import_stock_photos.py --per-group 25 --width 1920 --height 1080
+      - name: Restore mountains photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/mountains
+            docs/credits/mountains.json
+          key: ambient-v4-mountains-25-1920x1080
+      - name: Import mountains photos
+        run: python scripts/import_stock_photos.py --group mountains --per-group 25 --width 1920 --height 1080
+      - name: Save mountains photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/mountains
+            docs/credits/mountains.json
+          key: ambient-v4-mountains-25-1920x1080
+      - name: Restore forests photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/forests
+            docs/credits/forests.json
+          key: ambient-v4-forests-25-1920x1080
+      - name: Import forests photos
+        run: python scripts/import_stock_photos.py --group forests --per-group 25 --width 1920 --height 1080
+      - name: Save forests photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/forests
+            docs/credits/forests.json
+          key: ambient-v4-forests-25-1920x1080
+      - name: Restore coasts photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/coasts
+            docs/credits/coasts.json
+          key: ambient-v4-coasts-25-1920x1080
+      - name: Import coasts photos
+        run: python scripts/import_stock_photos.py --group coasts --per-group 25 --width 1920 --height 1080
+      - name: Save coasts photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/coasts
+            docs/credits/coasts.json
+          key: ambient-v4-coasts-25-1920x1080
+      - name: Restore water photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/water
+            docs/credits/water.json
+          key: ambient-v4-water-25-1920x1080
+      - name: Import water photos
+        run: python scripts/import_stock_photos.py --group water --per-group 25 --width 1920 --height 1080
+      - name: Save water photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/water
+            docs/credits/water.json
+          key: ambient-v4-water-25-1920x1080
+      - name: Restore islands photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/islands
+            docs/credits/islands.json
+          key: ambient-v4-islands-25-1920x1080
+      - name: Import islands photos
+        run: python scripts/import_stock_photos.py --group islands --per-group 25 --width 1920 --height 1080
+      - name: Save islands photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/islands
+            docs/credits/islands.json
+          key: ambient-v4-islands-25-1920x1080
+      - name: Restore volcanoes photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/volcanoes
+            docs/credits/volcanoes.json
+          key: ambient-v4-volcanoes-25-1920x1080
+      - name: Import volcanoes photos
+        run: python scripts/import_stock_photos.py --group volcanoes --per-group 25 --width 1920 --height 1080
+      - name: Save volcanoes photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/volcanoes
+            docs/credits/volcanoes.json
+          key: ambient-v4-volcanoes-25-1920x1080
+      - name: Restore countryside photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/countryside
+            docs/credits/countryside.json
+          key: ambient-v4-countryside-25-1920x1080
+      - name: Import countryside photos
+        run: python scripts/import_stock_photos.py --group countryside --per-group 25 --width 1920 --height 1080
+      - name: Save countryside photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/countryside
+            docs/credits/countryside.json
+          key: ambient-v4-countryside-25-1920x1080
+      - name: Restore landscapes photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            docs/images/landscapes
+            docs/credits/landscapes.json
+          key: ambient-v4-landscapes-25-1920x1080
+      - name: Import landscapes photos
+        run: python scripts/import_stock_photos.py --group landscapes --per-group 25 --width 1920 --height 1080
+      - name: Save landscapes photo cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            docs/images/landscapes
+            docs/credits/landscapes.json
+          key: ambient-v4-landscapes-25-1920x1080
+      - name: Aggregate photo credits
+        run: python scripts/import_stock_photos.py --finalize-credits
       - name: Generate groups catalog
         run: python scripts/generate_catalog.py
       - name: Verify gallery photo count

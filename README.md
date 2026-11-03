@@ -57,3 +57,22 @@ docs/ATTRIBUTION.md            # Generated credits and licenses
 tizen-app/index.html           # Native Tizen app (same UI)
 tizen-app/config.xml           # Tizen manifest
 ```
+
+## v3.1: rate-limit and retry fix
+
+Wikimedia Commons can return HTTP 429 from shared GitHub Actions IP ranges. The importer now respects `Retry-After`, applies exponential backoff and request pacing, and does not silently switch to unrelated images when the API is temporarily unavailable.
+
+The workflow processes one group at a time and caches **each successful 25-image group**. If an API limit occurs later, re-run the workflow after the server permits requests again: completed groups are restored instead of re-downloaded. The cache is keyed by group and 1920×1080/25 settings. Source photos are still downloaded into the GitHub Actions runner rather than the repository.
+
+To run locally instead of GitHub Actions:
+
+```bash
+python -m pip install -r requirements.txt
+for group in mountains forests coasts water islands volcanoes countryside landscapes; do
+  python scripts/import_stock_photos.py --group "$group" --per-group 25 || break
+done
+python scripts/import_stock_photos.py --finalize-credits
+python scripts/generate_catalog.py
+```
+
+A real authenticated/contactable User-Agent is preferable for production Wikimedia API usage: set `WIKIMEDIA_USER_AGENT` in the Actions environment with a contact URL/email. This importer cannot guarantee Commons will permit all 200 downloads on shared runners.
